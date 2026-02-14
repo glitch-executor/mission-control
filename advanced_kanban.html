@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ GLITCH EXECUTOR Mission Control</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            --bg-card: #1e1e1e;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #6b7280;
+            --border: #333333;
+            --border-light: #404040;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1a1a2e 50%, #16213e 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--accent-green), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-tab.active {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem 0.5rem 0.5rem 2.5rem;
+            color: var(--text-primary);
+            width: 250px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--accent-green), var(--accent-cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: black;
+        }
+
+        .refresh-btn, .archive-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover, .archive-btn:hover {
+            background: var(--bg-tertiary);
+        }
+
+        /* Statistics Bar */
+        .stats-bar {
+            background: rgba(26, 26, 26, 0.8);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stats-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-left {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .completion-rate {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .completion-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent-green) 0deg, var(--accent-green) var(--completion-angle, 61.2deg), var(--bg-tertiary) var(--completion-angle, 61.2deg));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .completion-circle::before {
+            content: '';
+            width: 45px;
+            height: 45px;
+            background: var(--bg-primary);
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .completion-text {
+            position: relative;
+            z-index: 1;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Filter Tabs */
+        .filter-section {
+            padding: 1rem 2rem;
+            background: var(--bg-secondary);
+        }
+
+        .filter-content {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .filter-tab.active {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        .filter-tab:hover:not(.active) {
+            background: var(--bg-tertiary);
+            border-color: var(--border-light);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            min-height: 600px;
+        }
+
+        .kanban-column {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .column-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .column-icon {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .recurring .column-icon { background: var(--accent-cyan); }
+        .scheduled .column-icon { background: var(--accent-yellow); }
+        .templates .column-icon { background: var(--accent-purple); }
+        .permanent .column-icon { background: var(--accent-red); }
+
+        .task-count {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .add-task-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .add-task-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .tasks-container {
+            min-height: 400px;
+        }
+
+        .task-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border-color: var(--border-light);
+        }
+
+        .task-card.priority-high {
+            border-left: 4px solid var(--accent-red);
+        }
+
+        .task-card.priority-medium {
+            border-left: 4px solid var(--accent-yellow);
+        }
+
+        .task-card.priority-low {
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .task-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+
+        .task-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .task-tag {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .task-tag.devops { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
+        .task-tag.growth { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
+        .task-tag.maintenance { background: rgba(245, 158, 11, 0.2); color: var(--accent-yellow); }
+        .task-tag.analytics { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); }
+
+        .task-progress {
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            background: var(--bg-tertiary);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-green);
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 3rem 1rem;
+            font-style: italic;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .stats-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .stats-left {
+                justify-content: center;
+            }
+
+            .kanban-board {
+                grid-template-columns: 1fr;
+            }
+
+            .search-box input {
+                width: 200px;
+            }
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .task-card {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--bg-tertiary);
+            border-radius: 50%;
+            border-top: 3px solid var(--accent-blue);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-light);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-bolt"></i>
+                    <span>Mission Control</span>
+                </div>
+                <div class="nav-tabs">
+                    <button class="nav-tab active">Tasks</button>
+                    <button class="nav-tab">Docs</button>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search tasks..." id="searchInput">
+                </div>
+                
+                <button class="archive-btn">
+                    <i class="fas fa-archive"></i> Archive
+                </button>
+                
+                <button class="refresh-btn" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                
+                <div class="user-menu">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <span id="username">admin</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Statistics Bar -->
+    <div class="stats-bar">
+        <div class="stats-content">
+            <div class="stats-left">
+                <div class="stat-item">
+                    <div class="stat-number" id="thisWeekCount">2</div>
+                    <div class="stat-label">This week</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="inProgressCount">3</div>
+                    <div class="stat-label">In progress</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalCount">12</div>
+                    <div class="stat-label">Total</div>
+                </div>
+            </div>
+            
+            <div class="completion-rate">
+                <div class="completion-circle" id="completionCircle">
+                    <span class="completion-text" id="completionText">17%</span>
+                </div>
+                <span>Completion</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <div class="filter-content">
+            <div class="filter-tabs">
+                <button class="filter-tab active">All projects</button>
+                <button class="filter-tab"><i class="fas fa-server"></i> DevOps</button>
+                <button class="filter-tab"><i class="fas fa-chart-line"></i> Growth</button>
+                <button class="filter-tab"><i class="fas fa-palette"></i> Design</button>
+                <button class="filter-tab"><i class="fas fa-user"></i> Personal</button>
+                <button class="filter-tab"><i class="fas fa-heart"></i> Wellness</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="kanban-board">
+            <!-- Recurring Column -->
+            <div class="kanban-column recurring">
+                <div class="column-header">
+                    <div class="column-title">
+                        <div class="column-icon"></div>
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Recurring</span>
+                    </div>
+                    <div class="task-count">0</div>
+                    <button class="add-task-btn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="tasks-container" id="recurringTasks">
+                    <div class="empty-state">No recurring jobs</div>
+                </div>
+            </div>
+
+            <!-- Scheduled Column -->
+            <div class="kanban-column scheduled">
+                <div class="column-header">
+                    <div class="column-title">
+                        <div class="column-icon"></div>
+                        <i class="fas fa-calendar"></i>
+                        <span>Scheduled</span>
+                    </div>
+                    <div class="task-count">0</div>
+                    <button class="add-task-btn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="tasks-container" id="scheduledTasks">
+                    <div class="empty-state">No scheduled tasks</div>
+                </div>
+            </div>
+
+            <!-- Templates Column -->
+            <div class="kanban-column templates">
+                <div class="column-header">
+                    <div class="column-title">
+                        <div class="column-icon"></div>
+                        <i class="fas fa-file-alt"></i>
+                        <span>Templates</span>
+                    </div>
+                    <div class="task-count">0</div>
+                    <button class="add-task-btn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="tasks-container" id="templateTasks">
+                    <div class="empty-state">No templates yet</div>
+                </div>
+            </div>
+
+            <!-- Permanent Column -->
+            <div class="kanban-column permanent">
+                <div class="column-header">
+                    <div class="column-title">
+                        <div class="column-icon"></div>
+                        <i class="fas fa-thumbtack"></i>
+                        <span>Permanent</span>
+                    </div>
+                    <div class="task-count" id="permanentCount">2</div>
+                    <button class="add-task-btn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="tasks-container" id="permanentTasks">
+                    <!-- Sample Tasks -->
+                    <div class="task-card priority-high">
+                        <div class="task-title">Weekly backup check</div>
+                        <div class="task-description">Verify all automated backups completed successfully</div>
+                        <div class="task-tags">
+                            <span class="task-tag devops">devops</span>
+                            <span class="task-tag maintenance">maintenance</span>
+                        </div>
+                        <div class="task-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-text">0/3</div>
+                        </div>
+                    </div>
+
+                    <div class="task-card priority-medium">
+                        <div class="task-title">Review analytics dashboard</div>
+                        <div class="task-description">Check KPIs and identify trends or anomalies</div>
+                        <div class="task-tags">
+                            <span class="task-tag growth">growth</span>
+                            <span class="task-tag analytics">analytics</span>
+                        </div>
+                        <div class="task-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-text">0/4</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Global state
+        let currentTasks = [];
+        let currentFilter = 'All projects';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTasks();
+            initializeEventListeners();
+            checkAuthentication();
+        });
+
+        // Authentication check
+        async function checkAuthentication() {
+            try {
+                const response = await fetch('/api/auth-status', {
+                    credentials: 'include'
+                });
+                
+                if (response.status === 401) {
+                    window.location.href = 'https://glitchexecutor.com';
+                    return;
+                }
+                
+                const data = await response.json();
+                if (data.user) {
+                    document.getElementById('username').textContent = data.user.username;
+                    document.getElementById('userAvatar').textContent = data.user.username.charAt(0).toUpperCase();
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+            }
+        }
+
+        // Load tasks from API
+        async function loadTasks() {
+            try {
+                const response = await fetch('/api/tasks', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentTasks = data.tasks || [];
+                    renderTasks();
+                    updateStatistics();
+                } else {
+                    console.error('Failed to load tasks:', response.status);
+                }
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+            }
+        }
+
+        // Render tasks in columns
+        function renderTasks() {
+            const columns = {
+                recurring: document.getElementById('recurringTasks'),
+                scheduled: document.getElementById('scheduledTasks'), 
+                templates: document.getElementById('templateTasks'),
+                permanent: document.getElementById('permanentTasks')
+            };
+
+            // Clear existing content
+            Object.values(columns).forEach(column => {
+                column.innerHTML = '';
+            });
+
+            // Filter and categorize tasks
+            const filteredTasks = currentTasks.filter(task => {
+                if (currentFilter === 'All projects') return true;
+                return task.tags && task.tags.some(tag => 
+                    tag.toLowerCase() === currentFilter.toLowerCase() ||
+                    currentFilter.toLowerCase().includes(tag.toLowerCase())
+                );
+            });
+
+            const categorizedTasks = {
+                recurring: filteredTasks.filter(t => t.type === 'recurring'),
+                scheduled: filteredTasks.filter(t => t.type === 'scheduled'),
+                templates: filteredTasks.filter(t => t.type === 'template'),
+                permanent: filteredTasks.filter(t => t.type === 'permanent' || !t.type)
+            };
+
+            // Render tasks in each column
+            Object.entries(categorizedTasks).forEach(([columnType, tasks]) => {
+                const container = columns[columnType];
+                
+                if (tasks.length === 0) {
+                    container.innerHTML = `<div class="empty-state">No ${columnType} ${columnType === 'permanent' ? 'tasks' : columnType === 'templates' ? 'yet' : columnType === 'scheduled' ? 'tasks' : 'jobs'}</div>`;
+                } else {
+                    tasks.forEach(task => {
+                        const taskCard = createTaskCard(task);
+                        container.appendChild(taskCard);
+                    });
+                }
+            });
+
+            // Update task counts
+            document.querySelector('.recurring .task-count').textContent = categorizedTasks.recurring.length;
+            document.querySelector('.scheduled .task-count').textContent = categorizedTasks.scheduled.length;
+            document.querySelector('.templates .task-count').textContent = categorizedTasks.templates.length;
+            document.querySelector('.permanent .task-count').textContent = categorizedTasks.permanent.length;
+        }
+
+        // Create task card element
+        function createTaskCard(task) {
+            const card = document.createElement('div');
+            card.className = `task-card priority-${task.priority || 'medium'}`;
+            
+            const completedSubtasks = task.subtasks ? task.subtasks.filter(st => st.done).length : 0;
+            const totalSubtasks = task.subtasks ? task.subtasks.length : 0;
+            const progress = totalSubtasks > 0 ? (completedSubtasks / totalSubtasks) * 100 : 0;
+            
+            card.innerHTML = `
+                <div class="task-title">${task.title}</div>
+                <div class="task-description">${task.description || ''}</div>
+                ${task.tags ? `
+                    <div class="task-tags">
+                        ${task.tags.map(tag => `<span class="task-tag ${tag.toLowerCase()}">${tag}</span>`).join('')}
+                    </div>
+                ` : ''}
+                ${totalSubtasks > 0 ? `
+                    <div class="task-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                        <div class="progress-text">${completedSubtasks}/${totalSubtasks}</div>
+                    </div>
+                ` : ''}
+            `;
+            
+            return card;
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const thisWeek = currentTasks.filter(task => {
+                const created = new Date(task.created || Date.now());
+                const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                return created >= weekAgo;
+            }).length;
+
+            const inProgress = currentTasks.filter(task => 
+                task.status === 'in_progress' || task.status === 'in-progress'
+            ).length;
+
+            const total = currentTasks.length;
+            const completed = currentTasks.filter(task => task.status === 'done').length;
+            const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            document.getElementById('thisWeekCount').textContent = thisWeek;
+            document.getElementById('inProgressCount').textContent = inProgress;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('completionText').textContent = `${completionRate}%`;
+
+            // Update completion circle
+            const circle = document.getElementById('completionCircle');
+            const angle = (completionRate / 100) * 360;
+            circle.style.setProperty('--completion-angle', `${angle}deg`);
+        }
+
+        // Event listeners
+        function initializeEventListeners() {
+            // Filter tabs
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.textContent.trim();
+                    renderTasks();
+                });
+            });
+
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const query = e.target.value.toLowerCase();
+                const taskCards = document.querySelectorAll('.task-card');
+                
+                taskCards.forEach(card => {
+                    const title = card.querySelector('.task-title').textContent.toLowerCase();
+                    const description = card.querySelector('.task-description').textContent.toLowerCase();
+                    
+                    if (title.includes(query) || description.includes(query)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Refresh data
+        async function refreshData() {
+            const refreshBtn = document.querySelector('.refresh-btn i');
+            refreshBtn.classList.add('fa-spin');
+            
+            await loadTasks();
+            
+            setTimeout(() => {
+                refreshBtn.classList.remove('fa-spin');
+            }, 1000);
+        }
+
+        // Logout function
+        async function logout() {
+            try {
+                await fetch('https://glitchexecutor.com/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                window.location.href = 'https://glitchexecutor.com';
+            } catch (error) {
+                console.error('Logout failed:', error);
+                window.location.href = 'https://glitchexecutor.com';
+            }
+        }
+
+        // Add logout click handler to user menu
+        document.addEventListener('DOMContentLoaded', function() {
+            const userMenu = document.querySelector('.user-menu');
+            userMenu.addEventListener('click', logout);
+            userMenu.style.cursor = 'pointer';
+        });
+    </script>
+</body>
+</html>
